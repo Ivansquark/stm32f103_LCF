@@ -1,5 +1,6 @@
 #include "main.h"
 
+void (*InterruptManager::IsrV[88])()={nullptr}; //! fill array with nullptrs
 uint16_t low=0;
 uint16_t high=0;
 bool timerSecFlag=0;
