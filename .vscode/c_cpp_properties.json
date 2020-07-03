@@ -7,7 +7,9 @@
             "includePath": 
             [
                 "${workspaceRoot}/inc/",
-                "${workspaceRoot}/lib/"                
+                "${workspaceRoot}/lib/",
+                "${workspaceRoot}/freeRTOS/inc/",
+                "${workspaceRoot}/freeRTOS/inc/"                
             ],
             "defines":
             [

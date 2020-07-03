@@ -10,6 +10,8 @@
 #include "timer3.h"
 #include "spilcd.h"
 #include "irq.h"
+#include "frwrapper.h"
+#include "frclasses.h"
 //#include "adc.h"
 //#include "button.h"
 

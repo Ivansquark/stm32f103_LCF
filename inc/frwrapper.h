@@ -103,33 +103,41 @@ private:
     SemaphoreHandle_t semHandle;
     //StaticSemaphore_t mutex;
 };
-/*******************************************************************************************/
 
-class BlinkFR:public iTaskFR
+/*!
+    \brief abstract FreeRTOS wrapper timer class
+*/
+class OS_timer
 {
 public:
-    BlinkFR(){leds_ini();}
-    ~BlinkFR()override{}
-    void run() override
+    OS_timer(const char* timName, const TickType_t period,const UBaseType_t AutoReload,
+            void * const pvTimerID=nullptr) //! period = 500/portTICK_RATE_MS 
     {
-        blink13();
+        //! AutoReload - pdTRUE - периодический, pdFalse - интервальный
+        xTimer = xTimerCreate(timName, period/portTICK_RATE_MS, AutoReload, pvTimerID, timerCallBack); 
+        //xTimer->pxCallbackFunction= timerCall; становится так
+        timer = this;         
     }
+    bool start(portTickType xBlockTime)
+    {
+        return (xTimerStart(xTimer,xBlockTime)==pdTRUE); //        
+    }
+    bool stop(portTickType xBlockTime)
+    {
+        return (xTimerStop(xTimer,xBlockTime)==pdTRUE);
+    }
+protected:
+    virtual void run()=0; //! abstract function that realizes callback, must be initialized in inheritor
 private:
-    void blink13()
-    {
-        while(1)
-        {
-            GPIOC->ODR^=GPIO_ODR_ODR13;
-            OS::sleep(200);
-        }        
+    xTimerHandle xTimer; //! pointer on a structure
+    static void timerCallBack(xTimerHandle xTimer)
+    {       
+        timer->run();
+        return;
     }
-    void leds_ini()
-    {
-        RCC->APB2ENR|=RCC_APB2ENR_IOPCEN;
-	    GPIOC->CRH&=~GPIO_CRH_CNF13;
-	    GPIOC->CRH|=GPIO_CRH_MODE13;//50MHz
-    }
+    static OS_timer* timer;
 };
-
+OS_timer* OS_timer::timer=nullptr;
+/*******************************************************************************************/
 
 #endif //FRWRAPPER_H_
