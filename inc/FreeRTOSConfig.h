@@ -48,7 +48,7 @@
 #define configTICK_RATE_HZ			((TickType_t)1000)
 #define configMAX_PRIORITIES		(5)    // Количество приоритетов задач
 #define configMINIMAL_STACK_SIZE	((unsigned short)80)
-#define configTOTAL_HEAP_SIZE		((size_t)(10*1024))  //10 MB from 20
+#define configTOTAL_HEAP_SIZE		((size_t)(5*1024))  //10 MB from 20
 #define configMAX_TASK_NAME_LEN		(16)
 #define configUSE_TRACE_FACILITY	0      //Используем ли мы отладочные примочки ОС
 #define configUSE_16_BIT_TICKS		0     // Разрядность таймера ОС. 1—16 бит, 0—32 бита. У STM32 SysTick 24 разрядный, поэтому оставляем тут 0. 
@@ -96,7 +96,7 @@ NVIC value of 255. */
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS			1       //! использование программного таймера 
-#define configTIMER_TASK_PRIORITY		3
+#define configTIMER_TASK_PRIORITY		1
 #define configTIMER_QUEUE_LENGTH		10
 #define configTIMER_TASK_STACK_DEPTH		configMINIMAL_STACK_SIZE
 

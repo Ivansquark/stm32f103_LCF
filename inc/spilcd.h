@@ -425,7 +425,7 @@ class Font_16x16: public Font_interface
 {
 public:
     Font_16x16(){}
-    
+    const char strArr[10]="opa";
     void symbol(uint16_t x, uint16_t y, uint16_t col,const uint16_t* data)
     {        
         tft_setColumn(x,x+16);

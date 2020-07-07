@@ -25,12 +25,12 @@ private:
             case 1:
             {
                 //***************** TIMER_1 - time counting to 100 milisecond  **************************************
-                RCC->APB1ENR|=RCC_APB2ENR_TIM1EN; //тактирование на таймер  ("НА ТАЙМЕР ЧАСТОТА ПРИХОДИТ БОЛЬШАЯ В ДВА РАЗА")
+                RCC->APB2ENR|=RCC_APB2ENR_TIM1EN; //тактирование на таймер  ("НА ТАЙМЕР ЧАСТОТА ПРИХОДИТ БОЛЬШАЯ В ДВА РАЗА")
                 TIM1->PSC=64000; //0  //делить частоту шины apb1(64MHz*2 при SysClk -128MHz) на 64000 => частота 2kHz 
-                TIM1->ARR=200-1; //считаем до 2000 => прерывание раз в 1 с  period                 
+                TIM1->ARR=200-1; //считаем до 2000 => прерывание раз в 100 мс  period                 
                 TIM1->CR1|=TIM_CR1_ARPE;  // задействуем регистр auto reload
 	            TIM1->DIER|=TIM_DIER_UIE; //включаем прерывание по таймеру -   1: Update interrupt enabled.
-                TIM1->CR1|=TIM_CR1_CEN; //включаем таймер
+                //TIM1->CR1|=TIM_CR1_CEN; //включаем таймер
 	            NVIC_EnableIRQ(TIM1_UP_IRQn); //включаем обработку прерывания по таймеру 1
             }break;
             case 2:
@@ -94,14 +94,24 @@ private:
 bool Timers::timerSecFlag=false;
 
 //--------------------------------------------------------------------------------------------------------
+uint16_t low=0;
+uint16_t high=0;
+uint32_t freq=0;
+
 extern "C" void TIM4_IRQHandler(void) //!обработчик прерывания раз в 1 с
 {
 	TIM4->SR &=~ TIM_SR_UIF; //скидываем флаг прерывания
 	Timers::timerSecFlag=true;
+    low=TIM2->CNT;
+	high=TIM3->CNT;
+	TIM3->CNT=0;
+	TIM2->CNT=0;
+    freq=(high<<16|low);    
 	NVIC_ClearPendingIRQ(TIM4_IRQn); //! скидываем флаг ожидания прерывания
 }
 //--------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------
+/*! antirattle timer */
 extern "C" void TIM1_UP_IRQHandler(void) //!обработчик прерывания раз в 100 ms
 {
     TIM1->CR1 &=~ TIM_CR1_CEN; //! Выключаем таймер

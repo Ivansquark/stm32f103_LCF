@@ -11,6 +11,8 @@ public:
     {
         but_ini();
     }
+    void run() override
+    {}
 private:
     void but_ini()
     {
@@ -72,34 +74,40 @@ private:
         NVIC_EnableIRQ(EXTI9_5_IRQn);  //Разрешаем прерывание в контроллере прерываний
     }
 };
-bool ButtonL::ButFlagL=false;
 extern "C" void EXTI0_IRQHandler()
 {
-    //for(int i=0;i<7200000;i++) {}  //ждем ~100 мс  от дребезга
     NVIC_DisableIRQ(EXTI0_IRQn);//! отключаем прерывание от кнопки
     TIM1->CR1|=TIM_CR1_CEN; //! включаем таймер1 для отсчета задержки от дребезга по прерыванию которого включаем прерывание от кнопки
     //button_flag=1;
     EXTI->PR = EXTI_PR_PR0; //Сбрасываем флаг прерывания
     LED13::toggle();
+    LCD_FR::checkFlag = true;
+    Calibration::calFlag=true; //! Вызываем задачу калибровки
 }
-
+/*! ButtL ButtC IRQ_handlers*/
 extern "C" void EXTI9_5_IRQHandler()
 {    
     if(EXTI->PR&EXTI_PR_PR6)
     {
-        NVIC_DisableIRQ(EXTI9_5_IRQn);//! отключаем прерывание от кнопки
+        MeasureL::Lflag=false;
+        MeasureC::Cflag=false;
+        NVIC_DisableIRQ(EXTI9_5_IRQn);//! отключаем прерывание от кнопки (прерывания не будет пока не отсчитает таймер 1)
         TIM1->CR1|=TIM_CR1_CEN; //! включаем таймер1 для отсчета задержки от дребезга по прерыванию которого включаем прерывание от кнопки
-        //!Сбрасываем флаг прерывания pb6
+        //!Сбрасываем флаг прерывания pb6 
         EXTI->PR=EXTI_PR_PR6;
-        Calibration::calFlag=true;        
+        Calibration::calFlag=true; //! Вызываем задачу калибровки
+        MeasureC::Cflag=true;        
     }
     if(EXTI->PR&EXTI_PR_PR7)
     {
-        NVIC_DisableIRQ(EXTI9_5_IRQn);//! отключаем прерывание от кнопки
+        MeasureL::Lflag=false;
+        MeasureC::Cflag=false;
+        NVIC_DisableIRQ(EXTI9_5_IRQn);//! отключаем прерывание от кнопки (прерывания не будет пока не отсчитает таймер 1)
         TIM1->CR1|=TIM_CR1_CEN; //! включаем таймер1 для отсчета задержки от дребезга по прерыванию которого включаем прерывание от кнопки
-        //!Сбрасываем флаг прерывания pb7
+        //!Сбрасываем флаг прерывания pb7 
         EXTI->PR=EXTI_PR_PR7;
         Calibration::calFlag=true;
+        MeasureL::Lflag=true;
     }
 }
 

@@ -2,21 +2,21 @@
 #define FRCLASSES_H_
 
 #include "frwrapper.h"
+#include "timer3.h"
 
 class TimerSingle1s:public OS_timer
 {
 public:
     TimerSingle1s(const char* timName, const TickType_t period,const UBaseType_t AutoReload,
-            void * const pvTimerID=nullptr):OS_timer(timName,period,AutoReload)
+            void * const pvTimerID=nullptr):OS_timer(timName,period,AutoReload,this)
     {}
     void run()override
     {
-        singleShot=true;
-        start(10);
-    }
-    static bool singleShot;
+        singleShot=true;       
+        //start(1);
+    }    
 };
-bool TimerSingle1s::singleShot = false;
+//bool TimerSingle1s::singleShot = false;
 
 class BlinkFR:public iTaskFR
 {
@@ -46,47 +46,44 @@ private:
 class LCD_FR: public iTaskFR
 {
 public:
-    LCD_FR(){}
+    LCD_FR(OS_timer* nTim=nullptr){tim = nTim;}
     ~LCD_FR(){}
     void run() override
     {
         SpiLcd lcd;
         lcd.fillScreen(0xff00);
         int x=0;
-        Font_16x16 fontSec;
+        Font_16x16 fontSec;        
+        tim->start(1);
         while(1)
         {
-            if(TimerSingle1s::singleShot)
+            if(tim->singleShot)
             {
                 x++;
                 fontSec.intToChar(x);
-                fontSec.print(100,100,0x00ff,fontSec.arr,1);
-                TimerSingle1s::singleShot=false;
-            }
+                fontSec.print(100,100,0x00ff,fontSec.arr,0);
+                if(checkFlag==false)
+                {
+                    tim->singleShot=false;                
+                }                
+            }    
+            if(tim->singleShot && checkFlag) //check button
+            {
+                //fontSec.arr = {'',};
+                fontSec.print(10,150,0xffff,fontSec.arr,0);
+                tim->singleShot=false;
+                checkFlag = false;                
+            } 
+            fontSec.intToChar(freq);
+            fontSec.print(10,50,0xffff,fontSec.arr,8);
+			Timers::timerSecFlag=false;
+            OS::sleep(200);
         }
-    }    
+    }  
+    static bool checkFlag;
+    OS_timer* tim;  
 };
-class MeasureL: public iTaskFR
-{
-public:
-    MeasureL(){}
-    void run() override
-    {
-        while(1)
-        {}
-    }    
-};
-
-class MeasureC: public iTaskFR
-{
-public:
-    MeasureC(){}
-    void run() override
-    {
-        while(1)
-        {}
-    }
-};
+bool LCD_FR::checkFlag=false;
 
 class Calibration: public iTaskFR
 {
@@ -99,11 +96,57 @@ public:
             if(calFlag==true)
             {
                 os_timer->start(10);
+                calFlag = false;
             }
+            OS::sleep(100);
         }
     }
     static bool calFlag;
     OS_timer* os_timer{nullptr};
 };
 bool Calibration::calFlag = false;
+
+class MeasureL: public iTaskFR
+{
+public:
+    MeasureL(OS_timer* Ntim = nullptr){tim = Ntim;}
+    void run() override
+    {
+        while(1)
+        {
+            if(tim->singleShot&&Lflag)
+            {
+                Calibration::calFlag = false;
+                Lflag = false;
+            }
+        }        
+    }
+    static bool Lflag;
+private:    
+    OS_timer* tim{nullptr};
+};
+bool MeasureL::Lflag=false;
+
+class MeasureC: public iTaskFR
+{
+public:
+    MeasureC(OS_timer* Ntim=nullptr){tim = Ntim;}
+    void run() override
+    {
+        while(1)
+        {
+            if(tim->singleShot&&Cflag)
+            {
+                Calibration::calFlag = false;
+                Cflag = false;
+            }
+        }
+    }    
+    static bool Cflag;
+private:
+    OS_timer* tim{nullptr};
+};
+bool MeasureC::Cflag=false;
+
+
 #endif //FRCLASSES_H_
