@@ -35,6 +35,7 @@ class ButtonC: public Interruptable
 public: 
     ButtonC(){butC_ini();}
     static bool ButFlagC;
+    void run()override{}
 private:
     void butC_ini()
     {
@@ -59,6 +60,7 @@ class ButtonL: public Interruptable
 public: 
     ButtonL(){butL_ini();}
     static bool ButFlagL;
+    void run()override{}
 private:
     void butL_ini()
     {

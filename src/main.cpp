@@ -8,11 +8,18 @@ void (*InterruptManager::IsrV[88])()={nullptr}; //! fill array with nullptrs
 
 //!******  Global classes needed because startScheduler rewrite main stack
 //******* so need to do global classes or implement classes in user heap by operator new
+/*!	\brief freeRTOS classes*/
+QueueOS<float,1> queueFloat; //!< create queue of float_32 (in bss near FreeRTOS heap2)
 TimerSingle3s singleTimer1("1",3000,pdFALSE); //!< set single shot timer on 3 seconds for pause before calibration and measuring results will counts
-LCD_FR lcd(&singleTimer1); //!< set LCD object and 
+LCD_FR lcd(&queueFloat,&singleTimer1); //!< set LCD object and 
 BlinkFR blink;
 Calibration calTask(&singleTimer1);
+MeasureL measureL(&queueFloat,&singleTimer1);
+MeasureC measureC(&queueFloat,&singleTimer1);
+/*!	\brief other global objects*/
 Button but;
+ButtonC butC;
+ButtonL butL;
 /*!<Init hardware timers>!*/
 Timers t1(1);   //!< antirattle timer 100ms 
 Timers tLow(2);	//!< master timer

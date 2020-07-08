@@ -99,7 +99,7 @@ public:
         const void* x = reinterpret_cast<const void*>(&item);
         return OS::queueSend(queueHandle,x,timeout);
     }
-    bool queueFromIsr(const T &item){return OS::queueSendISR(queueHandle,item);}
+    bool queueFromIsr(const T &item){return OS::queueSendISR(queueHandle,reinterpret_cast<void*>(item));}
     bool queueRecieve(T &item, uint32_t timeout){return OS::queueRecieve(queueHandle,&item,timeout);}
 private:
     QueueHandle_t queueHandle; //указатель на структуру очереди
