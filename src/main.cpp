@@ -1,3 +1,7 @@
+/*!
+ * \file main file with main function from which program is started after initialization procedure in startup.cpp
+ * 
+ */
 #include "main.h"
 void *__dso_handle = nullptr; // dummy
 void (*InterruptManager::IsrV[88])()={nullptr}; //! fill array with nullptrs
@@ -14,6 +18,7 @@ Timers t1(1);
 Timers tLow(2);
 Timers tHigh(3);
 Timers tSec(4);
+
 //!*************************************
 
 int main()
