@@ -1,3 +1,7 @@
+/*!
+    \file frapper on FreeRTOS for c++
+    realized many useful classes: iTaskFR, OS, QueueOS, SemaphorOS, OS_timer     
+*/
 #ifndef FRWRAPPER_H_
 #define FRWRAPPER_H_
 
@@ -10,34 +14,47 @@
 #include "portmacro.h"
 #include "main.h"
 
+/*!
+    \brief abstract class for TASKs interface 
+    realizes virtual function run() which must override by inherits
+*/
 class iTaskFR
 {
 public: 
     iTaskFR(){}
     virtual ~iTaskFR(){}
     virtual void run()=0;
-    TaskHandle_t handle=nullptr;   //pointer to task control structure of freertos
+    TaskHandle_t handle=nullptr;   //!< pointer to task control structure of freertos
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*!
+    \brief OS wrapper class
+    realizes c++ wrappers on freeRTOS functions
+*/
 class OS
 {
 public:
 /*************************- task -****************************************************************/
+    /*!  \brief static function thats creates tasks 
+     *  TODO change void on TaskHandle_t for setting task descriptor   
+    */
     static void taskCreate(iTaskFR* obj, const char *pName,const uint16_t stackDepth,uint8_t priority)
-    { obj->handle = (xTaskCreate(Run,pName,stackDepth,obj,priority,&obj->handle)==pdTRUE) ? obj->handle : nullptr;}                 
+    { obj->handle = (xTaskCreate(Run,pName,stackDepth,obj,priority,&obj->handle)==pdTRUE) ? obj->handle : nullptr;} //!< if true return pointer on a task else return nullptr                 
     //{ xTaskCreate(reinterpret_cast<TaskFunction_t>(Run),pName,stackDepth,&obj,priority,NULL);}
     
-/*************************- queue -**************************************************************/    
+/*!************************- queue -**************************************************************/    
+    /*! \brief Queue API wrapper
+    */
     static QueueHandle_t queueCreate(uint8_t length, uint8_t size)
     {return xQueueCreate(length,size);}    
     static bool queueSend(QueueHandle_t &queue, const void *pItemToQueue,uint16_t timeout)
-    {return (xQueueSend(queue, pItemToQueue, timeout)==pdTRUE);} // оператор == возвращает true, если 1 равно 2, в противном случае - false 
+    {return (xQueueSend(queue, pItemToQueue, timeout)==pdTRUE);} //!< оператор == возвращает true, если 1 равно 2, в противном случае - false 
     static bool queueSendISR(QueueHandle_t &queue, const void *pItemToQueue)
     {return (xQueueSendFromISR(queue, pItemToQueue, nullptr)==pdTRUE);}
     static bool queueRecieve(QueueHandle_t &queue,void* pItem, uint32_t timeout)
     {return (xQueueReceive(queue,pItem,timeout)==pdTRUE);}
     static void queueDelete(QueueHandle_t &queue){vQueueDelete(queue);}
-/********************************- semaphore -*************************************************/
+/*!*******************************- semaphore -*************************************************/
     static SemaphoreHandle_t semaphoreCreate()
     {return xSemaphoreCreateBinary();}
     static void semFromIsr(SemaphoreHandle_t handle)
@@ -46,36 +63,31 @@ public:
     {return xSemaphoreTake(handle, timeout);}
     static void deleteSemaphore(SemaphoreHandle_t handle)
     {vSemaphoreDelete(handle);}
-/********************************- critical section -********************************************/
+/*!*******************************- critical section -********************************************/
     static void criticalSectionEnter()
-    {
-        taskENTER_CRITICAL(); // prohibition interrupts and sysTick
-    }
+    {taskENTER_CRITICAL();} // prohibition interrupts and sysTick    
     static void criticalSectionLeave()
-    {
-        taskEXIT_CRITICAL();
-    }
+    {taskEXIT_CRITICAL();}
     static void criticalSectionEnterISR()
-    {
-        taskENTER_CRITICAL_FROM_ISR();
-        vTaskSuspendAll();
-    }
+    {taskENTER_CRITICAL_FROM_ISR(); vTaskSuspendAll();}
     static void criticalSectionLeaveISR(uint32_t x)
-    {
-        taskEXIT_CRITICAL_FROM_ISR(x);
-    }
+    {taskEXIT_CRITICAL_FROM_ISR(x);}
     static void stopScheduller(){vTaskSuspendAll();}
     static void newStartScheduller(){xTaskResumeAll();}
-/********************************- scheduller -**************************************************/
+/*!*******************************- scheduller -**************************************************/
     static void startScheduler()
     {vTaskStartScheduler();}
     static void sleep(uint16_t x){vTaskDelay(x);}
 private:
-    //static TaskFunction_t Run(void* x)  // void(*Run)(void*)    
-    static void Run(void* x)  // set object here
+    //!static TaskFunction_t Run(void* x)  == void(*Run)(void*)    function pointer
+    static void Run(void* x)  // set object here (callback function)    
     {static_cast<iTaskFR*>(x)->run();}    
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+/*!
+    \brief template class for freeRTOS queue 
+    because in queue we can send structure or object that has any size
+*/
 template<typename T,uint16_t length>
 class QueueOS
 {

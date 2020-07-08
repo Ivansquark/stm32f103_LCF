@@ -38,6 +38,7 @@ public:
 private:
     void butC_ini()
     {
+        /*!< PB6  button C >*/
         RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
         RCC->APB2ENR|=RCC_APB2ENR_AFIOEN;
         GPIOB->CRL &= ~(GPIO_CRL_MODE6 | GPIO_CRL_CNF6); // 0:0 input mode
@@ -61,6 +62,7 @@ public:
 private:
     void butL_ini()
     {
+        /*!< PB7  button L >*/
         RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
         RCC->APB2ENR|=RCC_APB2ENR_AFIOEN;
         GPIOB->CRL &= ~(GPIO_CRL_MODE7 | GPIO_CRL_CNF7); // 0:0 input mode
@@ -82,7 +84,7 @@ extern "C" void EXTI0_IRQHandler()
     EXTI->PR = EXTI_PR_PR0; //Сбрасываем флаг прерывания
     LED13::toggle();
     LCD_FR::checkFlag = true;
-    Calibration::calFlag=true; //! Вызываем задачу калибровки
+    Calibration::calStarts=true; //! Вызываем задачу калибровки
 }
 /*! ButtL ButtC IRQ_handlers*/
 extern "C" void EXTI9_5_IRQHandler()
@@ -95,7 +97,7 @@ extern "C" void EXTI9_5_IRQHandler()
         TIM1->CR1|=TIM_CR1_CEN; //! включаем таймер1 для отсчета задержки от дребезга по прерыванию которого включаем прерывание от кнопки
         //!Сбрасываем флаг прерывания pb6 
         EXTI->PR=EXTI_PR_PR6;
-        Calibration::calFlag=true; //! Вызываем задачу калибровки
+        Calibration::calStarts=true; //! Вызываем задачу калибровки
         MeasureC::Cflag=true;        
     }
     if(EXTI->PR&EXTI_PR_PR7)
@@ -106,7 +108,7 @@ extern "C" void EXTI9_5_IRQHandler()
         TIM1->CR1|=TIM_CR1_CEN; //! включаем таймер1 для отсчета задержки от дребезга по прерыванию которого включаем прерывание от кнопки
         //!Сбрасываем флаг прерывания pb7 
         EXTI->PR=EXTI_PR_PR7;
-        Calibration::calFlag=true;
+        Calibration::calStarts=true; //! Вызываем задачу калибровки
         MeasureL::Lflag=true;
     }
 }

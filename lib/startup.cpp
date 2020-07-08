@@ -1,3 +1,4 @@
+/*!	\file starup and initialization file*/
 extern "C" void Reset_Handler();//declarations to see it from everywhere
 extern "C" void NMI_Handler() __attribute__((weak,alias("Default_Handler"))); 
 extern "C" void HardFault_Handler() __attribute__((weak,alias("Default_Handler")));
@@ -68,13 +69,13 @@ extern "C" void DMA2_Channel2_IRQHandler() __attribute__((weak,alias("Default_Ha
 extern "C" void DMA2_Channel3_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void DMA2_Channel4_5_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void Default_Handler();
-int main();
+int main(); //!< declaration main function
 
 
 extern void* _estack; //start definitions  (start programm)
 void (*vectors[])() __attribute__((section(".vectors"))) //section .vectors
 {
-    (void(*)())(&_estack), ////_estack,  //take the address of stack and cast it to function pointer
+    (void(*)())(&_estack), ////_estack,  //take the address of stack(value) and cast it to function pointer
     Reset_Handler,
     NMI_Handler,
     HardFault_Handler,
@@ -154,10 +155,10 @@ void (*vectors[])() __attribute__((section(".vectors"))) //section .vectors
 
 extern void (*__preinit_array_start []) (void) __attribute__((weak)); //from linker
 extern void (*__preinit_array_end []) (void) __attribute__((weak));	//from linker
-extern void (*__init_array_start []) (void) __attribute__((weak)); //from linker
-extern void (*__init_array_end []) (void) __attribute__((weak)); //from linker
-extern void (*__fini_array_start []) (void) __attribute__((weak)); //from linker
-extern void (*__fini_array_end []) (void) __attribute__((weak)); //from linker
+extern void (*__init_array_start []) (void) __attribute__((weak)); //from linker constructors
+extern void (*__init_array_end []) (void) __attribute__((weak)); //from linker	constructors
+extern void (*__fini_array_start []) (void) __attribute__((weak)); //from linker destructors
+extern void (*__fini_array_end []) (void) __attribute__((weak)); //from linker	destructors
 void __attribute__ ((weak)) _init(void)  {} // dummy This section holds executable instructions that contribute to the process initialization code. When a program starts to run, the system arranges to execute the code in this section before calling the main program entry point (called main for C programs). 
 void __attribute__ ((weak)) _fini(void)  {} // dummy заглушка This section holds executable instructions that contribute to the process termination code. That is, when a program exits normally, the system arranges to execute the code in this section
 
@@ -166,7 +167,7 @@ void
 __libc_init_array (void) // static initialization constructors function
 {
   int count;  int i;
-  count = __preinit_array_end - __preinit_array_start; //counts of preinit functions DK what it
+  count = __preinit_array_end - __preinit_array_start; //counts of preinit functions DK what it is
   for (i = 0; i < count; i++)
     __preinit_array_start[i] ();
   _init ();
@@ -176,7 +177,7 @@ __libc_init_array (void) // static initialization constructors function
 }
 /* Run all the cleanup routines.  */
 void
-__libc_fini_array (void)
+__libc_fini_array (void) //!< destructors not usefull in microcontrollers
 {
   int count;
   int i;  
@@ -187,7 +188,7 @@ __libc_fini_array (void)
 }
 
 extern void* _sidata, *_sdata, *_edata, *_sbss, *_ebss;
-void __attribute__((naked,noreturn)) Reset_Handler()
+void __attribute__((naked,noreturn)) Reset_Handler()    
 {
     __asm volatile ("cpsid i"); //turn off interrupts
     void **i, **j;
@@ -195,7 +196,7 @@ void __attribute__((naked,noreturn)) Reset_Handler()
     {
         *j=*i; // copy data from ROM (_sidata) to RAM (_sdata)
     }
-    for (i=&_sbss;i!=&_ebss;i++)
+    for (i=&_sbss;i!=&_ebss;i++) //!< zeroing bss section
     {*i=0;}  
 	
 	__libc_init_array(); 

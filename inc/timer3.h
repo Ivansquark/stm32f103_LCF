@@ -106,7 +106,7 @@ extern "C" void TIM4_IRQHandler(void) //!обработчик прерывани
 	high=TIM3->CNT;
 	TIM3->CNT=0;
 	TIM2->CNT=0;
-    freq=(high<<16|low);    
+    freq=(high<<16|low);   //!< frequency accounting by summarizing two timers count registers 
 	NVIC_ClearPendingIRQ(TIM4_IRQn); //! скидываем флаг ожидания прерывания
 }
 //--------------------------------------------------------------------------------------------------------
