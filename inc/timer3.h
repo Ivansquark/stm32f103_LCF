@@ -24,7 +24,7 @@ private:
         {
             case 1:
             {
-                //***************** TIMER_1 - time counting to 100 milisecond  **************************************
+                /*! **************** \brief TIMER_1 - time counting to 100 milisecond  **************************************/
                 RCC->APB2ENR|=RCC_APB2ENR_TIM1EN; //тактирование на таймер  ("НА ТАЙМЕР ЧАСТОТА ПРИХОДИТ БОЛЬШАЯ В ДВА РАЗА")
                 TIM1->PSC=64000; //0  //делить частоту шины apb1(64MHz*2 при SysClk -128MHz) на 64000 => частота 2kHz 
                 TIM1->ARR=200-1; //считаем до 2000 => прерывание раз в 100 мс  period                 
@@ -100,7 +100,7 @@ uint32_t freq=0;
 
 extern "C" void TIM4_IRQHandler(void) //!обработчик прерывания раз в 1 с
 {
-	TIM4->SR &=~ TIM_SR_UIF; //скидываем флаг прерывания
+	TIM4->SR &=~ TIM_SR_UIF; //!< скидываем флаг прерывания
 	Timers::timerSecFlag=true;
     low=TIM2->CNT;
 	high=TIM3->CNT;
@@ -114,7 +114,7 @@ extern "C" void TIM4_IRQHandler(void) //!обработчик прерывани
 /*! antirattle timer */
 extern "C" void TIM1_UP_IRQHandler(void) //!обработчик прерывания раз в 100 ms
 {
-    TIM1->CR1 &=~ TIM_CR1_CEN; //! Выключаем таймер
+    TIM1->CR1 &=~ TIM_CR1_CEN; //!< Выключаем таймер
 	TIM1->SR &=~ TIM_SR_UIF; //скидываем флаг прерывания
     NVIC_EnableIRQ(EXTI0_IRQn);     //! Разрешаем прерывания от кнопки на PA0
 	NVIC_EnableIRQ(EXTI9_5_IRQn);   //! Разрешаем прерывания от кнопок на PB6 PB7

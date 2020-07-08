@@ -3,7 +3,7 @@
  * 
  */
 #include "main.h"
-void *__dso_handle = nullptr; // dummy
+void *__dso_handle = nullptr; // dummy "guard" that is used to identify dynamic shared objects during global destruction. (in fini in startup.cpp)
 void (*InterruptManager::IsrV[88])()={nullptr}; //! fill array with nullptrs
 
 //!*************************************  Global classes needed because startScheduler rewrite main stack
