@@ -44,7 +44,7 @@ private:
         RCC->APB2ENR|=RCC_APB2ENR_AFIOEN;
         GPIOB->CRL &= ~(GPIO_CRL_MODE6 | GPIO_CRL_CNF6); // 0:0 input mode
         GPIOB->CRL|=GPIO_CRL_CNF6_1; // CNF0[1:0] 1:0 - input with pull-up pull-down
-        GPIOB->ODR |= GPIO_ODR_ODR6; //pull-up
+        GPIOB->ODR &=~ GPIO_ODR_ODR6; //pull-down
         AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI6_PB; // EXTI on PB6
         EXTI->RTSR &=~ EXTI_RTSR_TR6; //rising trigger disabled       
         EXTI->FTSR |= EXTI_FTSR_TR6; //Прерывание по спаду импульса falling trigger enabled
@@ -69,7 +69,7 @@ private:
         RCC->APB2ENR|=RCC_APB2ENR_AFIOEN;
         GPIOB->CRL &= ~(GPIO_CRL_MODE7 | GPIO_CRL_CNF7); // 0:0 input mode
         GPIOB->CRL|=GPIO_CRL_CNF7_1; // CNF0[1:0] 1:0 - input with pull-up pull-down
-        GPIOB->ODR |= GPIO_ODR_ODR7; //pull-up
+        GPIOB->ODR &=~ GPIO_ODR_ODR7; //pull-down
         AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI7_PB; // EXTI on PB6
         EXTI->RTSR &=~ EXTI_RTSR_TR7; //rising trigger disabled       
         EXTI->FTSR |= EXTI_FTSR_TR7; //Прерывание по спаду импульса falling trigger enabled

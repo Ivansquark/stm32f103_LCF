@@ -62,11 +62,14 @@ public:
             if(calStarts==true)
             {
                 reedSwithCal();
-                tim->start(10); //!< start timer first time to get calEnds                               
+                tim->start(10); //!< start timer first time to get calEnds     
+                calStarts = false;                          
+                calStartEnds=true;
             }
-            else if(calStarts==true && tim->singleShot==true)
+            else if(calStartEnds==true && tim->singleShot==true)
             {
-                tim->singleShot=false; calEnds=true;  calStarts=false;
+                calStartEnds=false; tim->singleShot=false; calEnds=true;  calStarts=false;
+                //tim->start(10); //!< start timer second time to get calEnds     
                 {
                     if (freq!=0)
                     {
@@ -83,6 +86,7 @@ public:
     static float C_cal;
     static float L_cal; //!< 6.8 mH
 private:
+    bool calStartEnds{false};
     OS_timer* tim{nullptr};
     void reed_Cal_ini()
     {                   //!< 1-pb3 2-pb4 3-pb5 
@@ -95,7 +99,7 @@ private:
         GPIOB->CRL&=~GPIO_CRL_CNF5; //!< 0:0 push-pull
         GPIOB->BSRR|=GPIO_BSRR_BS3;
         GPIOB->BSRR|=GPIO_BSRR_BS4;
-        GPIOB->BSRR|=GPIO_BSRR_BS5;
+        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
     }
     void reedSwithCal() //!< swithes reed relay in calibration mode (1:0:1)
     {
@@ -120,7 +124,7 @@ public:
         float L=0;
         while(1)
         {
-            if(Calibration::calEnds && Lflag)
+            if(Calibration::calEnds && Lflag) //!< TODO here mistake!!!
             {reedSwitchL(); tim->start(1);} //!< starts singleshot timer again
             if(tim->singleShot && Lflag && Calibration::calEnds)
             {   
@@ -149,7 +153,7 @@ private:
         GPIOB->CRL&=~GPIO_CRL_CNF3; //!< 0:0 push-pull
         GPIOB->BSRR|=GPIO_BSRR_BS3;
         GPIOB->BSRR|=GPIO_BSRR_BS4;
-        GPIOB->BSRR|=GPIO_BSRR_BS5;
+        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
     }
     void reedSwitchL() //!< switch reed relay on L measurement (1:1:0)
     {
@@ -175,7 +179,7 @@ public:
             {reedSwitchC(); tim->start(1);} //!< starts singleshot timer again
             if(tim->singleShot && Cflag && Calibration::calEnds)
             {    
-                Calibration::calStarts = false;
+                Calibration::calEnds = false;
                 tim->singleShot=false;
                 Cflag = false;        
                 {
@@ -206,7 +210,7 @@ private:
     {
         GPIOB->BSRR|=GPIO_BSRR_BR3;
         GPIOB->BSRR|=GPIO_BSRR_BR4;
-        GPIOB->BSRR|=GPIO_BSRR_BS5;
+        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
     }
 };
 bool MeasureC::Cflag=false;
@@ -233,7 +237,7 @@ public:
             {
                 x++;
                 fontSec.intToChar(x);
-                fontSec.print(150,230,0x00ff,fontSec.arr,0);
+                fontSec.print(150,220,0x00ff,fontSec.arr,0);
                 if(checkFlag==false)
                 {
                     tim->singleShot=false;                

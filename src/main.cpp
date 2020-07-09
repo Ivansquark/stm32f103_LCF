@@ -36,6 +36,8 @@ int main()
 	//LCD_FR* lcd=new LCD_FR(singleTimer1); //!< implement two objects in user heap	
 	__enable_irq();
 	
+	OS::taskCreate(&measureL,"calibration",100,1);
+	OS::taskCreate(&measureC,"calibration",100,1);
 	OS::taskCreate(&calTask,"calibration",100,1);
 	OS::taskCreate(&blink,"blink",100,2); //! when stack size is not enough its goes in hardfault
 	OS::taskCreate(&lcd,"LCD",400,1);
