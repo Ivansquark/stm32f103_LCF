@@ -125,12 +125,11 @@ public:
         while(1)
         {
             if(Calibration::calEnds && Lflag) //!< TODO here mistake!!!
-            {reedSwitchL(); tim->start(1);} //!< starts singleshot timer again
-            if(tim->singleShot && Lflag && Calibration::calEnds)
+            {reedSwitchL(); tim->start(1); Lstart=true; Calibration::calEnds = false;} //!< starts singleshot timer again
+            if(tim->singleShot && Lflag && Lstart)
             {   
                 tim->singleShot=false;         
-                Lflag = false;
-                Calibration::calEnds = false;
+                Lflag = false; Lstart =false;                
                 { //!< TODO here L must accounting
                     L = 1/(freq*freq*4*3.14*3.14*Calibration::C_cal)-Calibration::L_cal;
                     queueFloat->queueFrom(L,10);
@@ -139,7 +138,8 @@ public:
         }        
     }
     static bool Lflag;
-private:    
+private:   
+    bool Lstart =false;
     OS_timer* tim{nullptr};
     QueueOS<float,1>* queueFloat{nullptr};
     void reed_ports_ini()
@@ -176,10 +176,10 @@ public:
         while(1)
         {
             if(Calibration::calEnds && Cflag)
-            {reedSwitchC(); tim->start(1);} //!< starts singleshot timer again
-            if(tim->singleShot && Cflag && Calibration::calEnds)
-            {    
-                Calibration::calEnds = false;
+            {reedSwitchC(); tim->start(1); Cstart = true; Calibration::calEnds = false;} //!< starts singleshot timer again
+            if(tim->singleShot && Cflag && Cstart)
+            {                   
+                Cstart = false;
                 tim->singleShot=false;
                 Cflag = false;        
                 {
@@ -191,6 +191,7 @@ public:
     }    
     static bool Cflag;
 private:
+bool Cstart = false;
     OS_timer* tim{nullptr};
     QueueOS<float,1>* queueFloat{nullptr};
     void reed_ports_ini()
