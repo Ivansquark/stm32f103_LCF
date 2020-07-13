@@ -98,18 +98,13 @@ private:
         GPIOA->CRH&=~GPIO_CRH_CNF8; //!< 0:0 push-pull
         GPIOA->CRH|=GPIO_CRH_MODE9; //!< 1:1 50 MHz
         GPIOA->CRH&=~GPIO_CRH_CNF9; //!< 0:0 push-pull
-
         GPIOB->CRL|=GPIO_CRL_MODE5; //!< 1:1 50 MHz
         GPIOB->CRL&=~GPIO_CRL_CNF5; //!< 0:0 push-pull
-        GPIOA->BSRR|=GPIO_BSRR_BS8;
-        GPIOA->BSRR|=GPIO_BSRR_BS9;
-        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS5);//!< sets to 1 thats block relay coil
     }
     void reedSwithCal() //!< swithes reed relay in calibration mode (1:0:1)
     {        
-        GPIOA->BSRR|=GPIO_BSRR_BS8;
-        GPIOA->BSRR|=GPIO_BSRR_BR9; //!< to zero that turn on reed
-        GPIOB->BSRR|=GPIO_BSRR_BS5;
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BR9|GPIO_BSRR_BS5);//!< to zero that turn on reed
     }
 };
 bool Calibration::calStarts = false;
@@ -128,7 +123,7 @@ public:
         float L=0;
         while(1)
         {
-            if(Calibration::calEnds && Lflag) //!< TODO here mistake!!!
+            if(Calibration::calEnds && Lflag) 
             {reedSwitchL(); tim->start(1); Lstart=true; Calibration::calEnds = false;} //!< starts singleshot timer again
             if(tim->singleShot && Lflag && Lstart)
             {   
@@ -160,20 +155,13 @@ private:
         GPIOA->CRH&=~GPIO_CRH_CNF9; //!< 0:0 push-pull
         GPIOB->CRL|=GPIO_CRL_MODE5; //!< 1:1 50 MHz
         GPIOB->CRL&=~GPIO_CRL_CNF5; //!< 0:0 push-pull
-        GPIOA->BSRR|=GPIO_BSRR_BS8;
-        GPIOA->BSRR|=GPIO_BSRR_BS9;
-        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS5);//!< sets to 1 thats block relay coil
     }
     void reedSwitchL() //!< switch reed relay on L measurement (1:1:0)
     {
-        GPIOA->BSRR|=GPIO_BSRR_BS8;
-        GPIOA->BSRR|=GPIO_BSRR_BS9;
-        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
-
-        GPIOA->BSRR|=GPIO_BSRR_BS8;
-        GPIOA->BSRR|=GPIO_BSRR_BS9;
-        GPIOB->BSRR|=GPIO_BSRR_BR5;    }
-    
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS5);//!< sets to 1 thats block relay coil
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BR5);
+    }    
 };
 bool MeasureL::Lflag=false;
 //-----------------------------------------------------------------------------------------
@@ -221,19 +209,12 @@ bool Cstart = false;
         GPIOA->CRH&=~GPIO_CRH_CNF9; //!< 0:0 push-pull
         GPIOB->CRL|=GPIO_CRL_MODE5; //!< 1:1 50 MHz
         GPIOB->CRL&=~GPIO_CRL_CNF5; //!< 0:0 push-pull
-        GPIOA->BSRR|=GPIO_BSRR_BS8;
-        GPIOA->BSRR|=GPIO_BSRR_BS9;
-        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS5); //!< sets to 1 thats block relay coil
     }
     void reedSwitchC() //!< switch reed relay on L measurement (0:0:1)
     {
-        GPIOA->BSRR|=GPIO_BSRR_BS8;
-        GPIOA->BSRR|=GPIO_BSRR_BS9;
-        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
-
-        GPIOA->BSRR|=GPIO_BSRR_BR8;
-        GPIOA->BSRR|=GPIO_BSRR_BR9;
-        GPIOB->BSRR|=GPIO_BSRR_BS5; //!< sets to 1 thats block relay coil
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS5);//!< sets to 1 thats block relay coil
+        GPIOA->BSRR|=(GPIO_BSRR_BR8|GPIO_BSRR_BR9|GPIO_BSRR_BS5);
     }
 };
 bool MeasureC::Cflag=false;
