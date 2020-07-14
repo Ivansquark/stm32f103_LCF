@@ -15,7 +15,7 @@ ButtonL butL;
 
 /*!	\brief freeRTOS classes*/
 QueueOS<float,1> queueFloat; //!< create queue of float_32 (in bss near FreeRTOS heap2)
-TimerSingle3s singleTimer1("1",6000,pdFALSE); //!< set single shot timer on 3 seconds for pause before calibration and measuring results will counts
+TimerSingle3s singleTimer1("1",7000,pdFALSE); //!< set single shot timer on 7 seconds for pause before calibration and measuring results will counts
 LCD_FR lcd(&queueFloat,&singleTimer1); //!< set LCD object and 
 BlinkFR blink;
 Calibration calTask(&singleTimer1);
