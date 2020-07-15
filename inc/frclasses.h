@@ -75,7 +75,9 @@ public:
                 {
                     if (freq!=0)
                     {
-                        C_cal = 1/(freq*freq*4*3.14*3.14*L_cal)*1E12;
+                        // TODO: rfequency allways different
+                        // end need to match frequency to C_cal that is equal to 940 pF 
+                        C_cal = 1E9*(1/(freq*freq*4*3.14*3.14*L_cal*1E-3));
                     }
                     else C_cal=0;                    
                 } //!< TODO here frequency must accounting                
@@ -149,8 +151,8 @@ public:
     }
     static bool Lflag;
 private:   
-    bool Lstart = false;
-    bool Lends = false;
+    bool Lstart = false;  //!< Flag that indicates start of inductance measurement and to switch reed relay
+    bool Lends = false;   //!< Flag that indicates about ending of inductance measurement
     OS_timer* tim{nullptr};
     QueueOS<float,1>* queueFloat{nullptr};
     void reed_ports_ini()
@@ -212,8 +214,8 @@ public:
     }    
     static bool Cflag;
 private:
-    bool Cstart = false;
-    bool Cends = false;
+    bool Cstart = false;   //!< Flag that indicates start of capatience measurements and to switch reed relay
+    bool Cends = false;    //!< Flag that indicates about ending of capatience measurement
     OS_timer* tim{nullptr};
     QueueOS<float,1>* queueFloat{nullptr};
     void reed_ports_ini()
