@@ -57,6 +57,7 @@ public:
     Calibration(OS_timer* Ntim=nullptr){tim = Ntim; reed_Cal_ini(); L_cal=6.8;}
     void run() override
     {
+        constexpr float pipi4 = 1.0/(4*3.14*3.14);
         while(1)
         {
             if(calStarts==true)
@@ -69,7 +70,7 @@ public:
             else if(calStartEnds==true && tim->singleShot==true)
             {
                 calStartEnds=false; tim->singleShot=false; 
-                //calEnds=true;
+                calEnds=true;
                 calStarts=false;
                 //tim->start(10); //!< start timer second time to get calEnds     
                 {
@@ -77,7 +78,7 @@ public:
                     {
                         // TODO: rfequency allways different
                         // end need to match frequency to C_cal that is equal to 940 pF 
-                        C_cal = 1E9*(1/(freq*freq*4*3.14*3.14*L_cal*1E-3));
+                        C_cal = pipi4*1E12*(1.0/(freq*freq*L_cal));
                     }
                     else C_cal=0;                    
                 } //!< TODO here frequency must accounting                
@@ -123,6 +124,7 @@ public:
     void run() override
     {
         float L=0;
+        constexpr float pipi4 = 1.0/(4*3.14*3.14);
         while(1)
         {
             if(Calibration::calEnds && Lflag) 
@@ -134,22 +136,25 @@ public:
                 { //!< TODO here L must accounting
                     if(freq!=0)
                     {
-                        L = 1/(freq*freq*4*3.14*3.14*Calibration::C_cal)-Calibration::L_cal;
+                        L = pipi4*1E9*(1.0/(freq*freq*Calibration::C_cal))-Calibration::L_cal;
                     }
                     else L=0;                    
                     queueFloat->queueFrom(L,10);
                     Lends = true; // flag to ends measure
+                    Lqueue = true;            
                 }                     
             }
-            if(Lends=true && tim->singleShot) //!< stopping measuring
+            if(Lends==true && tim->singleShot) //!< stopping measuring
             {
                 tim->singleShot = false;
                 GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10); //!< sets to 1 thats block relay coil
                 Lends = true;
-            }            
+            }    
+            OS::sleep(100);        
         }        
     }
     static bool Lflag;
+    static bool Lqueue;
 private:   
     bool Lstart = false;  //!< Flag that indicates start of inductance measurement and to switch reed relay
     bool Lends = false;   //!< Flag that indicates about ending of inductance measurement
@@ -174,6 +179,7 @@ private:
     }    
 };
 bool MeasureL::Lflag=false;
+bool MeasureL::Lqueue=false;
 //-----------------------------------------------------------------------------------------
 /*! \brief measuring C task class*/
 class MeasureC: public iTaskFR
@@ -184,35 +190,42 @@ public:
     void run() override
     {
         float C=0;
+        constexpr float pipi4 = 1.0/(4*3.14*3.14);
         while(1)
         {
             if(Calibration::calEnds && Cflag)
-            {reedSwitchC(); tim->start(1); Cstart = true; Calibration::calEnds = false;} //!< starts singleshot timer again
+            {
+                reedSwitchC(); tim->start(1); Cstart = true; 
+                //Calibration::calEnds = false;
+            } //!< starts singleshot timer again
             if(tim->singleShot && Cflag && Cstart)
             {                   
                 Cstart = false;
                 tim->singleShot=false;
                 Cflag = false;        
                 {
-                    if (freq==0)
+                    if (freq!=0)
                     {
-                        C = 1/(freq*freq*4*3.14*3.14*Calibration::L_cal)-Calibration::C_cal;
+                        C = pipi4*1E12*(1.0/(freq*freq*Calibration::L_cal))-Calibration::C_cal;
                     }
                     else C=0;
                     queueFloat->queueFrom(C,10);
                     tim->start(1);
                     Cends = true;
+                    Cqueue = true;
                 } //!< TODO here C must accounting                                
             }
-            if(Cends=true && tim->singleShot) //!< stopping measuring
+            if(Cends==true && tim->singleShot) //!< stopping measuring
             {
                 tim->singleShot = false;
                 GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10); //!< sets to 1 thats block relay coil
                 Cends = true;
             }
+            OS::sleep(100);
         }
     }    
     static bool Cflag;
+    static bool Cqueue;
 private:
     bool Cstart = false;   //!< Flag that indicates start of capatience measurements and to switch reed relay
     bool Cends = false;    //!< Flag that indicates about ending of capatience measurement
@@ -237,6 +250,7 @@ private:
     }
 };
 bool MeasureC::Cflag=false;
+bool MeasureC::Cqueue=false;
 //---------------------------------------------------------------------------------
 //!< \brief LCD class that send information on screen
 class LCD_FR: public iTaskFR
@@ -274,14 +288,23 @@ public:
             } 
             fontSec.intToChar(freq); //!< shows everytime
             fontSec.print(5,10,0x0fff,fontSec.arr,8);
-            //if(Calibration::calEnds)
-            //{
+            if(Calibration::calEnds)
+            {
                 C=Calibration::C_cal;
-            //}
-            if(MeasureC::Cflag){queueFloat->queueRecieve(C,1);}
+                Calibration::calEnds = false;
+            }
+            if(MeasureC::Cqueue)
+            {
+                queueFloat->queueRecieve(C,1);
+                MeasureC::Cqueue = false;
+            }
             fontSec.floatTochar(C); //!< shows everytime
             fontSec.print(10,100,0xf00f,fontSec.arrFloat,6);
-            if(MeasureL::Lflag){queueFloat->queueRecieve(L,1);}
+            if(MeasureL::Lqueue)
+            {
+                queueFloat->queueRecieve(L,1);
+                MeasureL::Lqueue = false;    
+            }
             fontSec.floatTochar(L); //!< shows everytime
             fontSec.print(10,150,0x0ff0,fontSec.arrFloat,6);
 			Timers::timerSecFlag=false;

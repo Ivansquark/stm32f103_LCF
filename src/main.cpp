@@ -37,13 +37,12 @@ int main()
 	//TimerSingle1s* singleTimer1 = new TimerSingle1s("1",1000,pdTRUE); //! set single shot timer on 1 seconds
 	//LCD_FR* lcd=new LCD_FR(singleTimer1); //!< implement two objects in user heap	
 	__enable_irq();
-	OS::taskCreate(&measureL,"calibration",100,1);
-	OS::taskCreate(&measureC,"calibration",100,1);
+	OS::taskCreate(&measureL,"measureL",100,1);
+	OS::taskCreate(&measureC,"measureC",100,1);
 	OS::taskCreate(&calTask,"calibration",100,1);
 	OS::taskCreate(&blink,"blink",100,2); //! when stack size is not enough its goes in hardfault
 	OS::taskCreate(&lcd,"LCD",400,1);
 	OS::startScheduler(); //! перетирает стэк in main	
-
 	
 	while(1)
 	{	
