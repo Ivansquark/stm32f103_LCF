@@ -95,6 +95,8 @@ extern "C" void EXTI9_5_IRQHandler()
     {
         MeasureL::Lflag=false;
         MeasureC::Cflag=false;
+        Calibration::calStarts = false;
+        Calibration::calEnds = false;
         NVIC_DisableIRQ(EXTI9_5_IRQn);//! отключаем прерывание от кнопки (прерывания не будет пока не отсчитает таймер 1)
         TIM1->CR1|=TIM_CR1_CEN; //! включаем таймер1 для отсчета задержки от дребезга по прерыванию которого включаем прерывание от кнопки
         //!Сбрасываем флаг прерывания pb6 
@@ -104,6 +106,8 @@ extern "C" void EXTI9_5_IRQHandler()
     }
     if(EXTI->PR&EXTI_PR_PR7)
     {
+        Calibration::calEnds = false;
+        Calibration::calStarts = false;
         MeasureL::Lflag=false;
         MeasureC::Cflag=false;
         NVIC_DisableIRQ(EXTI9_5_IRQn);//! отключаем прерывание от кнопки (прерывания не будет пока не отсчитает таймер 1)

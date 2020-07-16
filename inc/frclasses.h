@@ -136,7 +136,8 @@ public:
                 { //!< TODO here L must accounting
                     if(freq!=0)
                     {
-                        L = pipi4*1E9*(1.0/(freq*freq*Calibration::C_cal))-Calibration::L_cal;
+                        float L1 = pipi4*1E9*(1.0/(freq*freq*Calibration::C_cal));
+                        L = abs(L1 - Calibration::L_cal);
                     }
                     else L=0;                    
                     queueFloat->queueFrom(L,10);
@@ -148,7 +149,7 @@ public:
             {
                 tim->singleShot = false;
                 GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10); //!< sets to 1 thats block relay coil
-                Lends = true;
+                Lends = false;
             }    
             OS::sleep(100);        
         }        
@@ -206,8 +207,8 @@ public:
                 {
                     if (freq!=0)
                     {
-                        float C1 = pipi4*1E12*(1.0/(freq*freq*Calibration::L_cal));
-                        C = C1-Calibration::C_cal;
+                        float C1 = pipi4*1E12*(1.0/(freq*freq*Calibration::L_cal)); //!< accounting C
+                        C = abs(C1-Calibration::C_cal);
                     }
                     else C=0;
                     queueFloat->queueFrom(C,10);
@@ -220,7 +221,7 @@ public:
             {
                 tim->singleShot = false;
                 GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10); //!< sets to 1 thats block relay coil
-                Cends = true;
+                Cends = false;
             }
             OS::sleep(100);
         }
@@ -293,6 +294,9 @@ public:
             {
                 C=Calibration::C_cal;
                 Calibration::calEnds = false;
+                x++;
+                fontSec.intToChar(x);
+                fontSec.print(150,220,0x00ff,fontSec.arr,0);
             }
             if(MeasureC::Cqueue)
             {
@@ -311,7 +315,7 @@ public:
 			Timers::timerSecFlag=false;
             OS::sleep(500);
         }
-    }  
+    }    
     static bool checkFlag;
     OS_timer* tim;
     QueueOS<float,1>* queueFloat{nullptr};  
