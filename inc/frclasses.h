@@ -206,7 +206,8 @@ public:
                 {
                     if (freq!=0)
                     {
-                        C = pipi4*1E12*(1.0/(freq*freq*Calibration::L_cal))-Calibration::C_cal;
+                        float C1 = pipi4*1E12*(1.0/(freq*freq*Calibration::L_cal));
+                        C = C1-Calibration::C_cal;
                     }
                     else C=0;
                     queueFloat->queueFrom(C,10);
