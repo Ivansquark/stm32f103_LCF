@@ -114,6 +114,7 @@ bool Calibration::calStarts = false;
 bool Calibration::calEnds = false;
 float Calibration::C_cal = 0;
 float Calibration::L_cal = 0;
+
 //-------------------------------------------------------------------------------------------------
 /*! \brief measuring L task class*/
 class MeasureL: public iTaskFR
@@ -136,13 +137,15 @@ public:
                 { //!< TODO here L must accounting
                     if(freq!=0)
                     {
-                        float L1 = pipi4*1E9*(1.0/(freq*freq*Calibration::C_cal));
-                        L = abs(L1 - Calibration::L_cal);
+                        float L1 = pipi4*1E12*(1.0/(freq*freq*Calibration::C_cal));
+                        L = L1 - Calibration::L_cal;
+                        L=L*1000;
                     }
                     else L=0;                    
                     queueFloat->queueFrom(L,10);
                     Lends = true; // flag to ends measure
-                    Lqueue = true;            
+                    Lqueue = true;  
+                    tim->start(1);          
                 }                     
             }
             if(Lends==true && tim->singleShot) //!< stopping measuring
@@ -176,7 +179,7 @@ private:
     void reedSwitchL() //!< switch reed relay on L measurement (1:1:0)
     {
         GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);//!< sets to 1 thats block relay coil
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BR10);
+        GPIOA->BSRR|=(GPIO_BSRR_BR8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);
     }    
 };
 bool MeasureL::Lflag=false;
@@ -207,8 +210,8 @@ public:
                 {
                     if (freq!=0)
                     {
-                        float C1 = pipi4*1E12*(1.0/(freq*freq*Calibration::L_cal)); //!< accounting C
-                        C = abs(C1-Calibration::C_cal);
+                        float C1 = pipi4*(1.0/(1E-12*freq*freq*Calibration::L_cal)); //!< accounting C
+                        C = C1-Calibration::C_cal;
                     }
                     else C=0;
                     queueFloat->queueFrom(C,10);
@@ -248,7 +251,7 @@ private:
     void reedSwitchC() //!< switch reed relay on L measurement (0:0:1)
     {
         GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);//!< sets to 1 thats block relay coil
-        GPIOA->BSRR|=(GPIO_BSRR_BR8|GPIO_BSRR_BR9|GPIO_BSRR_BS10);
+        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BR9|GPIO_BSRR_BR10);
     }
 };
 bool MeasureC::Cflag=false;
