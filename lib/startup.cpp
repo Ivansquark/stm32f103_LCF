@@ -51,13 +51,12 @@ extern "C" void USART2_IRQHandler() __attribute__((weak,alias("Default_Handler")
 extern "C" void USART3_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void EXTI15_10_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void RTCAlarm_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void TIM8_BRK_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void TIM8_UP_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void TIM8_TRG_COM_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void TIM8_CC_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void ADC3_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void FSMC_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void SDIO_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void OTG_FS_WKUP_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+//extern "C" void TIM8_BRK_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+//extern "C" void TIM8_UP_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+//extern "C" void TIM8_TRG_COM_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+//extern "C" void TIM8_CC_IRQHandler() __attribute__((weak,alias("Default_Handler")));//extern "C" void ADC3_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+//extern "C" void FSMC_IRQHandler() __attribute__((weak,alias("Default_Handler")));//extern "C" void SDIO_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void TIM5_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void SPI3_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void UART4_IRQHandler() __attribute__((weak,alias("Default_Handler")));
@@ -67,10 +66,17 @@ extern "C" void TIM7_IRQHandler() __attribute__((weak,alias("Default_Handler")))
 extern "C" void DMA2_Channel1_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void DMA2_Channel2_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void DMA2_Channel3_IRQHandler() __attribute__((weak,alias("Default_Handler")));
-extern "C" void DMA2_Channel4_5_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void DMA2_Channel4_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void DMA2_Channel5_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void ETH_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void ETH_WKUP_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void CAN2_TX_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void CAN2_RX0_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void CAN2_RX1_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void CAN2_SCE_IRQHandler() __attribute__((weak,alias("Default_Handler")));
+extern "C" void OTG_FS_IRQHandler() __attribute__((weak,alias("Default_Handler")));
 extern "C" void Default_Handler();
 int main(); //!< declaration main function
-
 
 extern void* _estack; //start definitions  (start programm)
 void (*vectors[])() __attribute__((section(".vectors"))) //section .vectors
@@ -133,14 +139,14 @@ void (*vectors[])() __attribute__((section(".vectors"))) //section .vectors
 	USART3_IRQHandler,         			/* USART3 global interrupt                          */
 	EXTI15_10_IRQHandler,      			/* EXTI Line[15:10] interrupts                      */
 	RTCAlarm_IRQHandler,       			/* RTC Alarms through EXTI line interrupt           */
+	OTG_FS_WKUP_IRQHandler,				/* USB On-The-Go FS Wakeup line interrupt through EXTI line interrupt */
 	0,                         			/* Reserved                                         */
-	TIM8_BRK_IRQHandler,       			/* TIM8 Break interrupt                             */
-	TIM8_UP_IRQHandler,        			/* TIM8 Update interrupt                            */
-	TIM8_TRG_COM_IRQHandler,   			/* TIM8 Trigger and Commutation interrupts          */
-	TIM8_CC_IRQHandler,        			/* TIM8 Capture Compare interrupt                   */
-	ADC3_IRQHandler,           			/* ADC3 global interrupt                            */
-	FSMC_IRQHandler,           			/* FSMC global interrupt                            */
-	SDIO_IRQHandler,           			/* SDIO global interrupt                            */
+	0,       			/* Reserved                           */
+	0,        			/* Reserved                           */
+	0,   			/* Reserved          */
+	0,        			/* Reserved                   */
+	0,           			/* Reserved                            */
+	0,           			/* Reserved                            */	
 	TIM5_IRQHandler,           			/* TIM5 global interrupt                            */
 	SPI3_IRQHandler,           			/* SPI3 global interrupt                            */
 	UART4_IRQHandler,          			/* UART4 global interrupt                           */
@@ -150,7 +156,15 @@ void (*vectors[])() __attribute__((section(".vectors"))) //section .vectors
 	DMA2_Channel1_IRQHandler,  			/* DMA2 Channel1 global interrupt                   */
 	DMA2_Channel2_IRQHandler,  			/* DMA2 Channel2 global interrupt                   */
 	DMA2_Channel3_IRQHandler,  			/* DMA2 Channel3 global interrupt                   */
-	DMA2_Channel4_5_IRQHandler			/* DMA2 Channel4 and DMA2 Channel5 global interrupt */
+	DMA2_Channel4_IRQHandler,			/* DMA2 Channel4 and DMA2 Channel5 global interrupt */
+	DMA2_Channel5_IRQHandler,			/* DMA2 Channel5 and DMA2 Channel5 global interrupt */
+	ETH_IRQHandler,						/* ETH interrupt */
+	ETH_WKUP_IRQHandler,				/* ETH_WKUP interrupt */
+	CAN2_TX_IRQHandler,					/* CAN2_TX interrupt */
+	CAN2_RX0_IRQHandler,				/* CAN2_RX0 interrupt */
+	CAN2_RX1_IRQHandler,				/* CAN2_RX1 interrupt */
+	CAN2_SCE_IRQHandler,				/* CAN2_SCE interrupt */
+	OTG_FS_IRQHandler					/* OTG_FS_IRQHandler global interrupt */
 };
 
 extern void (*__preinit_array_start []) (void) __attribute__((weak)); //from linker

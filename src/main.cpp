@@ -8,7 +8,7 @@ void (*InterruptManager::IsrV[88])()={nullptr}; //! fill array with nullptrs
 
 //!******  Global classes needed because startScheduler rewrite main stack
 //******* so need to do global classes or implement classes in user heap by operator new
-/*!	\brief other global objects*/
+///*!	\brief other global objects*/
 Button but;
 ButtonC butC;
 ButtonL butL;
@@ -32,7 +32,11 @@ Timers tSec(4); //!< precision one second timer
 
 int main()
 {	
-	RCCini rcc;	//! 128 MHz
+	RCC->APB2ENR|=RCC_APB2ENR_AFIOEN;
+	AFIO->MAPR|=AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+	RCCini rcc;	//! 72 MHz
+	SpiLcd lcd1;
+	lcd1.fillScreen(0xffff);
 	LED13 led;
 	//TimerSingle1s* singleTimer1 = new TimerSingle1s("1",1000,pdTRUE); //! set single shot timer on 1 seconds
 	//LCD_FR* lcd=new LCD_FR(singleTimer1); //!< implement two objects in user heap	
@@ -44,9 +48,16 @@ int main()
 	OS::taskCreate(&lcd,"LCD",400,1);
 	OS::startScheduler(); //! перетирает стэк in main	
 	
+	int x=0;
+	RCC->APB2ENR|=RCC_APB2ENR_IOPEEN;
+	GPIOE->CRL&=~GPIO_CRL_CNF0;
+	GPIOE->CRL|=GPIO_CRL_MODE0;
 	while(1)
 	{	
-
+		x++;
+		GPIOE->ODR^=GPIO_ODR_ODR0;
+		for(uint8_t i=0;i<255;i++)
+		{lcd1.fillScreen(i);}
 	}
     return 0;
 }

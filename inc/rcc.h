@@ -24,10 +24,11 @@ private:
         RCC->CFGR|=(uint32_t)RCC_CFGR_PPRE1_DIV2; // APB1 clk SYSCLK делим на 2  (36MHz)
         RCC->CFGR|=(uint32_t)RCC_CFGR_PPRE2_DIV1; // APB2 clk SYSCLK делим на 1  (72MHz)
 
-        RCC->CFGR|=RCC_CFGR_PLLSRC_HSE;  // выбираем источником HSE а не HSI/2
+        RCC->CFGR|=RCC_CFGR_PLLSRC; //!< 1: HSE oscillator clock selected as PLL input clock
+        RCC->CFGR&=~RCC_CFGR_PLLXTPRE;  // выбираем источником HSE DIV=1
         //RCC->CFGR&=~RCC_CFGR_PLLXTPRE; //и так ноль
-
-        RCC->CFGR|=RCC_CFGR_PLLMULL16; // 8MHz HSE * 16 = 128MHz SYSCLK
+        RCC->CFGR|=RCC_CFGR_PLLMULL9;
+        //RCC->CFGR|=RCC_CFGR_PLLMULL; // 8MHz HSE * 9 = 72MHz SYSCLK   (0:1:1:1:1)
 
         RCC->CR|=RCC_CR_PLLON; // включаем тактирование с PLL
         while(!(RCC->CR&RCC_CR_PLLRDY)){} // пока не появится флаг включения PLL

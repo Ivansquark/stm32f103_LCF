@@ -9,12 +9,19 @@
 class Spi1_interface
 {
 public:
-    inline void reset_active(){GPIOA->BSRR|=GPIO_BSRR_BR2;}
-    inline void reset_idle(){GPIOA->BSRR|=GPIO_BSRR_BS2;}
-    inline void cs_active(){GPIOA->BSRR|=GPIO_BSRR_BR4;}
-    inline void cs_idle(){GPIOA->BSRR|=GPIO_BSRR_BS4;}
-    inline void dc_command(){GPIOA->BSRR|=GPIO_BSRR_BR3;}
-    inline void dc_data(){GPIOA->BSRR|=GPIO_BSRR_BS3;}
+    //inline void reset_active(){GPIOA->BSRR|=GPIO_BSRR_BR2;}
+    //inline void reset_idle(){GPIOA->BSRR|=GPIO_BSRR_BS2;}
+    //inline void cs_active(){GPIOA->BSRR|=GPIO_BSRR_BR4;}
+    //inline void cs_idle(){GPIOA->BSRR|=GPIO_BSRR_BS4;}
+    //inline void dc_command(){GPIOA->BSRR|=GPIO_BSRR_BR3;}
+    //inline void dc_data(){GPIOA->BSRR|=GPIO_BSRR_BS3;}
+
+    inline void reset_active(){GPIOE->BSRR|=GPIO_BSRR_BR2;}
+    inline void reset_idle(){GPIOE->BSRR|=GPIO_BSRR_BS2;}
+    inline void cs_active(){GPIOE->BSRR|=GPIO_BSRR_BR4;}
+    inline void cs_idle(){GPIOE->BSRR|=GPIO_BSRR_BS4;}
+    inline void dc_command(){GPIOE->BSRR|=GPIO_BSRR_BR3;}
+    inline void dc_data(){GPIOE->BSRR|=GPIO_BSRR_BS3;}
     
     inline void ST7789_SendCommand(uint8_t cmd)
     {
@@ -112,29 +119,48 @@ private:
     void spi1_ini()
     {
         //------------- настройка RESET (display reset) PA2-------------------
-        RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
-        GPIOA->CRL|=GPIO_CRL_MODE2; // output mode 1:1 max speed
-        GPIOA->CRL&=~GPIO_CRL_CNF2_0;
-        GPIOA->CRL&=~GPIO_CRL_CNF2_1; // 0:0 - output push pull
-	    GPIOA->BSRR=0x0000ffff; // low level
+        //RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
+        //GPIOA->CRL|=GPIO_CRL_MODE2; // output mode 1:1 max speed
+        //GPIOA->CRL&=~GPIO_CRL_CNF2_0;
+        //GPIOA->CRL&=~GPIO_CRL_CNF2_1; // 0:0 - output push pull
+	    //GPIOA->BSRR=0x0000ffff; // low level
+        RCC->APB2ENR|=RCC_APB2ENR_IOPEEN;
+        GPIOE->CRL|=GPIO_CRL_MODE2; // output mode 1:1 max speed
+        GPIOE->CRL&=~GPIO_CRL_CNF2_0;
+        GPIOE->CRL&=~GPIO_CRL_CNF2_1; // 0:0 - output push pull
+	    GPIOE->BSRR=0x0000ffff; // low level
 
         //------------- настройка DC (data command) PA3-------------------
-        GPIOA->CRL|=GPIO_CRL_MODE3; // output mode 1:1 max speed
-        GPIOA->CRL&=~GPIO_CRL_CNF3_0;
-        GPIOA->CRL&=~GPIO_CRL_CNF3_1; // 0:0 - output push pull
-	    
+        //GPIOA->CRL|=GPIO_CRL_MODE3; // output mode 1:1 max speed
+        //GPIOA->CRL&=~GPIO_CRL_CNF3_0;
+        //GPIOA->CRL&=~GPIO_CRL_CNF3_1; // 0:0 - output push pull
+        GPIOE->CRL|=GPIO_CRL_MODE3; // output mode 1:1 max speed
+        GPIOE->CRL&=~GPIO_CRL_CNF3_0;
+        GPIOE->CRL&=~GPIO_CRL_CNF3_1; // 0:0 - output push pull
+
         //------------- настройка CS (chip select NSS) PA4-------------------
         GPIOA->CRL|=GPIO_CRL_MODE4; // output mode 1:1 max speed
         GPIOA->CRL&=~GPIO_CRL_CNF4_0;
         GPIOA->CRL&=~GPIO_CRL_CNF4_1; // 0:0 - output push pull
 
+        
         //------------- настройка ножек SPI:  PA5-_SCK, PA6-MISO(not realized), PA7-MOSI :::AF5
-        GPIOA->CRL|=GPIO_CRL_MODE5; // output mode 1:1 max speed
-        GPIOA->CRL&=~GPIO_CRL_CNF5_0;
-        GPIOA->CRL|=GPIO_CRL_CNF5_1; // 1:0 - alternate push pull
-        GPIOA->CRL|=GPIO_CRL_MODE7; // output mode 1:1 max speed
-        GPIOA->CRL&=~GPIO_CRL_CNF7_0;
-        GPIOA->CRL|=GPIO_CRL_CNF7_1; // 1:0 - alternate push pull
+        //GPIOA->CRL|=GPIO_CRL_MODE5; // output mode 1:1 max speed
+        //GPIOA->CRL&=~GPIO_CRL_CNF5_0;
+        //GPIOA->CRL|=GPIO_CRL_CNF5_1; // 1:0 - alternate push pull
+        //GPIOA->CRL|=GPIO_CRL_MODE7; // output mode 1:1 max speed
+        //GPIOA->CRL&=~GPIO_CRL_CNF7_0;
+        //GPIOA->CRL|=GPIO_CRL_CNF7_1; // 1:0 - alternate push pull
+
+        RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
+        RCC->APB2ENR|=RCC_APB2ENR_AFIOEN;
+        AFIO->MAPR|=AFIO_MAPR_SPI1_REMAP;
+        GPIOB->CRL|=GPIO_CRL_MODE3; // output mode 1:1 max speed
+        GPIOB->CRL&=~GPIO_CRL_CNF3_0;
+        GPIOB->CRL|=GPIO_CRL_CNF3_1; // 1:0 - alternate push pull
+        GPIOB->CRL|=GPIO_CRL_MODE5; // output mode 1:1 max speed
+        GPIOB->CRL&=~GPIO_CRL_CNF5_0;
+        GPIOB->CRL|=GPIO_CRL_CNF5_1; // 1:0 - alternate push pull
                 
         //------------- тактируем SPI-1  ---------------------------
         RCC->APB2ENR|=RCC_APB2ENR_SPI1EN; //clock on fast SPI-1

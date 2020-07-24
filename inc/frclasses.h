@@ -94,20 +94,19 @@ private:
     bool calStartEnds{false};
     OS_timer* tim{nullptr};
     void reed_Cal_ini()
-    {                   //!< 1-pb3 2-pb4 3-pb5 
-        RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
-        RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
-        GPIOA->CRH|=GPIO_CRH_MODE8; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF8; //!< 0:0 push-pull
-        GPIOA->CRH|=GPIO_CRH_MODE9; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF9; //!< 0:0 push-pull
-        GPIOA->CRH|=GPIO_CRH_MODE10; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF10; //!< 0:0 push-pull
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);//!< sets to 1 thats block relay coil
+    {                   //!< 1-pd0 2-pd1 3-pd2 
+        RCC->APB2ENR|=RCC_APB2ENR_IOPDEN;
+        GPIOD->CRL|=GPIO_CRL_MODE0; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF0; //!< 0:0 push-pull
+        GPIOD->CRL|=GPIO_CRL_MODE1; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF1; //!< 0:0 push-pull
+        GPIOD->CRL|=GPIO_CRL_MODE2; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF2; //!< 0:0 push-pull
+        GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BS1|GPIO_BSRR_BS2);//!< sets to 1 thats block relay coil
     }
     void reedSwithCal() //!< swithes reed relay in calibration mode (1:0:1)
     {        
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BR9|GPIO_BSRR_BS10);//!< to zero that turn on reed
+        GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BR1|GPIO_BSRR_BS2);//!< to zero that turn on reed
     }
 };
 bool Calibration::calStarts = false;
@@ -151,7 +150,7 @@ public:
             if(Lends==true && tim->singleShot) //!< stopping measuring
             {
                 tim->singleShot = false;
-                GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10); //!< sets to 1 thats block relay coil
+                GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BS1|GPIO_BSRR_BS2); //!< sets to 1 thats block relay coil
                 Lends = false;
             }    
             OS::sleep(100);        
@@ -166,20 +165,19 @@ private:
     QueueOS<float,1>* queueFloat{nullptr};
     void reed_ports_ini()
     {
-        RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
-        RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
-        GPIOA->CRH|=GPIO_CRH_MODE8; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF8; //!< 0:0 push-pull
-        GPIOA->CRH|=GPIO_CRH_MODE9; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF9; //!< 0:0 push-pull
-        GPIOA->CRH|=GPIO_CRH_MODE10; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF10; //!< 0:0 push-pull
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);//!< sets to 1 thats block relay coil
+        RCC->APB2ENR|=RCC_APB2ENR_IOPDEN;
+        GPIOD->CRL|=GPIO_CRL_MODE0; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF0; //!< 0:0 push-pull
+        GPIOD->CRL|=GPIO_CRL_MODE1; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF1; //!< 0:0 push-pull
+        GPIOD->CRL|=GPIO_CRL_MODE2; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF2; //!< 0:0 push-pull
+        GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BS1|GPIO_BSRR_BS2);//!< sets to 1 thats block relay coil
     }
     void reedSwitchL() //!< switch reed relay on L measurement (1:1:0)
     {
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);//!< sets to 1 thats block relay coil
-        GPIOA->BSRR|=(GPIO_BSRR_BR8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);
+        GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BS1|GPIO_BSRR_BS2);//!< sets to 1 thats block relay coil
+        GPIOD->BSRR|=(GPIO_BSRR_BR0|GPIO_BSRR_BS1|GPIO_BSRR_BS2);
     }    
 };
 bool MeasureL::Lflag=false;
@@ -223,7 +221,7 @@ public:
             if(Cends==true && tim->singleShot) //!< stopping measuring
             {
                 tim->singleShot = false;
-                GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10); //!< sets to 1 thats block relay coil
+                GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BS1|GPIO_BSRR_BS2); //!< sets to 1 thats block relay coil
                 Cends = false;
             }
             OS::sleep(100);
@@ -238,20 +236,19 @@ private:
     QueueOS<float,1>* queueFloat{nullptr};
     void reed_ports_ini()
     {
-        RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
-        RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
-        GPIOA->CRH|=GPIO_CRH_MODE8; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF8; //!< 0:0 push-pull
-        GPIOA->CRH|=GPIO_CRH_MODE9; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF9; //!< 0:0 push-pull
-        GPIOA->CRH|=GPIO_CRH_MODE10; //!< 1:1 50 MHz
-        GPIOA->CRH&=~GPIO_CRH_CNF10; //!< 0:0 push-pull
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10); //!< sets to 1 thats block relay coil
+        RCC->APB2ENR|=RCC_APB2ENR_IOPDEN;
+        GPIOD->CRL|=GPIO_CRL_MODE0; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF0; //!< 0:0 push-pull
+        GPIOD->CRL|=GPIO_CRL_MODE1; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF1; //!< 0:0 push-pull
+        GPIOD->CRL|=GPIO_CRL_MODE2; //!< 1:1 50 MHz
+        GPIOD->CRL&=~GPIO_CRL_CNF2; //!< 0:0 push-pull
+        GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BS1|GPIO_BSRR_BS2);//!< sets to 1 thats block relay coil
     }
     void reedSwitchC() //!< switch reed relay on L measurement (0:0:1)
     {
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BS9|GPIO_BSRR_BS10);//!< sets to 1 thats block relay coil
-        GPIOA->BSRR|=(GPIO_BSRR_BS8|GPIO_BSRR_BR9|GPIO_BSRR_BR10);
+        GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BS1|GPIO_BSRR_BS2);//!< sets to 1 thats block relay coil
+        GPIOD->BSRR|=(GPIO_BSRR_BS0|GPIO_BSRR_BR1|GPIO_BSRR_BR2);
     }
 };
 bool MeasureC::Cflag=false;
