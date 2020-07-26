@@ -118,7 +118,7 @@ public:
 private:
     void spi1_ini()
     {
-        //------------- настройка RESET (display reset) PA2-------------------
+        //------------- настройка RESET (display reset) PE2-------------------
         //RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
         //GPIOA->CRL|=GPIO_CRL_MODE2; // output mode 1:1 max speed
         //GPIOA->CRL&=~GPIO_CRL_CNF2_0;
@@ -130,7 +130,7 @@ private:
         GPIOE->CRL&=~GPIO_CRL_CNF2_1; // 0:0 - output push pull
 	    GPIOE->BSRR=0x0000ffff; // low level
 
-        //------------- настройка DC (data command) PA3-------------------
+        //------------- настройка DC (data command) PE3-------------------
         //GPIOA->CRL|=GPIO_CRL_MODE3; // output mode 1:1 max speed
         //GPIOA->CRL&=~GPIO_CRL_CNF3_0;
         //GPIOA->CRL&=~GPIO_CRL_CNF3_1; // 0:0 - output push pull

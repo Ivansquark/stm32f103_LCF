@@ -83,7 +83,7 @@ public:
                     else C_cal=0;                    
                 } //!< TODO here frequency must accounting                
             }
-            OS::sleep(100);
+            OS::sleep(200);
         }
     }
     static bool calStarts;
@@ -127,8 +127,10 @@ public:
         constexpr float pipi4 = 1.0/(4*3.14*3.14);
         while(1)
         {
-            if(Calibration::calEnds && Lflag) 
-            {reedSwitchL(); tim->start(1); Lstart=true; Calibration::calEnds = false;} //!< starts singleshot timer again
+            if(Calibration::calEnds && Lflag) //!< starts singleshot timer again
+            {
+                reedSwitchL(); tim->start(1); Lstart=true; Calibration::calEnds = false;
+            } 
             if(tim->singleShot && Lflag && Lstart)
             {   
                 tim->singleShot=false;         
@@ -270,8 +272,13 @@ public:
         tim->start(1);
         float C=0;
         float L=0;
+        RCC->APB2ENR|=RCC_APB2ENR_IOPDEN;
+        GPIOD->CRH|=GPIO_CRH_MODE12;
+        GPIOD->CRH&=~GPIO_CRH_CNF12;
+        GPIOD->BSRR|=GPIO_BSRR_BS12;
         while(1)
         {
+            GPIOD->ODR^=GPIO_ODR_ODR12;
             if(tim->singleShot)
             {
                 x++;
@@ -279,7 +286,7 @@ public:
                 fontSec.print(150,220,0x00ff,fontSec.arr,0);
                 if(checkFlag==false)
                 {
-                    tim->singleShot=false;                
+                    //tim->singleShot=false;                
                 }                
             }    
             if(tim->singleShot && checkFlag) //check button
@@ -304,16 +311,18 @@ public:
                 MeasureC::Cqueue = false;
             }
             fontSec.floatTochar(C); //!< shows everytime
-            fontSec.print(10,100,0xf00f,fontSec.arrFloat,6);
+            fontSec.print(10,50,0xf00f,fontSec.arrFloat,6);
             if(MeasureL::Lqueue)
             {
                 queueFloat->queueRecieve(L,1);
                 MeasureL::Lqueue = false;    
             }
             fontSec.floatTochar(L); //!< shows everytime
-            fontSec.print(10,150,0x0ff0,fontSec.arrFloat,6);
-			Timers::timerSecFlag=false;
-            OS::sleep(500);
+            fontSec.print(10,100,0x0ff0,fontSec.arrFloat,6);
+			Timers::timerSecFlag=false;            
+            fontSec.intToChar(TIM3->CNT); //!< shows everytime
+            fontSec.print(10,200,0x0fff,fontSec.arr,3);
+            OS::sleep(10);
         }
     }    
     static bool checkFlag;

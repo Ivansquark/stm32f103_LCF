@@ -44,7 +44,7 @@
 #define configUSE_TICKLESS_IDLE	0   // 1 - when idle => no ticks   for low consumption
 #define configUSE_IDLE_HOOK			0   // 1 - using function that intercept IDLE т.е. при попадании в Idle будет выполнена некая функция. Например загон проца в спячку
 #define configUSE_TICK_HOOK			0   // можно поставить зацепку за диспетчер и выполнять какую-нибудь фигню каждый тик. 
-#define configCPU_CLOCK_HZ			((unsigned long)128000000)
+#define configCPU_CLOCK_HZ			((unsigned long)72000000)
 #define configTICK_RATE_HZ			((TickType_t)1000)
 #define configMAX_PRIORITIES		(5)    // Количество приоритетов задач
 #define configMINIMAL_STACK_SIZE	((unsigned short)80)

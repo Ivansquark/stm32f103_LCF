@@ -16,16 +16,14 @@ CPPFLAGS = -c -g -O0 -Wall -nostartfiles -lstdc++ \
 	-mcpu=cortex-m3 -mthumb -march=armv7-m -Wno-pointer-arith -mfloat-abi=soft \
 	-ffast-math -fno-math-errno -ffunction-sections -fdata-sections \
 	-fno-rtti -fno-exceptions -specs=nosys.specs -specs=nano.specs -fno-common -D"assert_param(x)=" \
-	-L/usr/lib/arm-none-eabi/newlib/ 
-	#-u_printf_float 
+	-L/usr/lib/arm-none-eabi/newlib/ -u_printf_float 
 CFLAGS = -Wall -g -O0 -specs=nosys.specs -specs=nano.specs \
 	 -c -fno-common -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -Wno-pointer-arith 
 LCPPFLAGS = -mcpu=cortex-m3 -mthumb -nostartfiles -lm -lc -lgcc \
 		 -specs=nano.specs -specs=nosys.specs -fno-exceptions -fno-rtti \
 		 -mfloat-abi=soft -fno-use-cxa-atexit \
 		 -L/usr/lib/arm-none-eabi/newlib/thumb/v7-m/ -L/usr/lib/arm-none-eabi/newlib/ \
-		 	-Xlinker -Map=main.map -z muldefs
-			# -u_printf_float 
+		 	-Xlinker -Map=main.map -z muldefs -u_printf_float 
 LDFLAGS =  -marmelf --gc-sections -lgcc -lm -lc \
 	-L/usr/lib/gcc/arm-none-eabi/7.3.1/ -L/usr/lib/gcc/arm-none-eabi/7.3.1/thumb/v7-m/
 	
